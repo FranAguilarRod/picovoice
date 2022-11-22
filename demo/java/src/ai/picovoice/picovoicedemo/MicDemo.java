@@ -15,6 +15,12 @@ package ai.picovoice.picovoicedemo;
 import ai.picovoice.picovoice.Picovoice;
 import ai.picovoice.picovoice.PicovoiceInferenceCallback;
 import ai.picovoice.picovoice.PicovoiceWakeWordCallback;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 import org.apache.commons.cli.*;
 
 import javax.sound.sampled.*;
@@ -32,6 +38,12 @@ public class MicDemo {
             String porcupineLibraryPath, String porcupineModelPath, float porcupineSensitivity,
             String rhinoLibraryPath, String rhinoModelPath, float rhinoSensitivity, float rhinoEndpointDuration,
             int audioDeviceIndex, String outputPath, boolean requireEndpoint) {
+        Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("http://192.168.1.128:8123/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+
+        RetrofitApi service = retrofit.create(RetrofitApi.class);
 
         // for file output
         File outputFile = null;
@@ -64,6 +76,19 @@ public class MicDemo {
                 }
                 System.out.println("  }");
                 System.out.println("}");
+
+                service.sendEvent(inference.getIntent(), inference.getSlots()).enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        System.out.println("onResponse" + response);
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        System.out.println("onFailure" + t);
+                    }
+                });
+
             } else {
                 System.out.println("Didn't understand the command.");
             }
