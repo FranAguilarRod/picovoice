@@ -105,6 +105,18 @@ public class MicDemo {
 
             } else {
                 System.out.println("Didn't understand the command.");
+
+                service.sendWakeWord("No te he entendido").enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        System.out.println("onResponse" + response);
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        System.out.println("onFailure" + t);
+                    }
+                });
             }
         };
 
