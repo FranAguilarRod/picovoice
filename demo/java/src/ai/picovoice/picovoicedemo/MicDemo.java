@@ -31,6 +31,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 public class MicDemo {
@@ -90,17 +92,32 @@ public class MicDemo {
                 System.out.println("  }");
                 System.out.println("}");
 
-                service.sendEvent(inference.getIntent(), inference.getSlots()).enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-                        System.out.println("onResponse" + response);
-                    }
+                if (inference.getIntent().equals("GetTime")) {
+                    Calendar now = Calendar.getInstance();
+                    String nowString = "son las " + now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE);
+                    System.out.println(nowString);
+                    service.sendWakeWord(nowString).enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                        }
 
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                        System.out.println("onFailure" + t);
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                        }
+                    });
+                } else {
+                    service.sendEvent(inference.getIntent(), inference.getSlots()).enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            System.out.println("onResponse" + response);
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            System.out.println("onFailure" + t);
+                        }
+                    });
+                }
 
             } else {
                 System.out.println("Didn't understand the command.");
