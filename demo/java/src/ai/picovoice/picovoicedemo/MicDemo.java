@@ -64,7 +64,21 @@ public class MicDemo {
             return;
         }
 
-        PicovoiceWakeWordCallback wakeWordCallback = () -> System.out.println("[wake word]");
+        PicovoiceWakeWordCallback wakeWordCallback = () -> {
+            System.out.println("[wake word]");
+
+            service.sendWakeWord("dime").enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    System.out.println("onResponse" + response);
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    System.out.println("onFailure" + t);
+                }
+            });
+        };
         PicovoiceInferenceCallback inferenceCallback = inference -> {
             if (inference.getIsUnderstood()) {
 

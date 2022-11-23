@@ -15,4 +15,10 @@ public interface RetrofitApi {
         @Path("event") String event,
         @Body Map<String, String> slots
     );
+
+
+    @POST("http://192.168.1.128:12101/api/text-to-speech")
+    Call<Void> sendWakeWord(
+        @Body String text
+    );
 }
