@@ -24,6 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import org.apache.commons.cli.*;
 
 import javax.sound.sampled.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,11 +34,19 @@ import java.nio.ByteOrder;
 import java.util.Map;
 
 public class MicDemo {
+
+    private static final String[] understand = {
+        "No te he entendido",
+        "Que dise cabesa",
+        "¿Me lo puedes repetir?"
+    };
+
     public static void runDemo(
-            String accessKey, String keywordPath, String contextPath,
-            String porcupineLibraryPath, String porcupineModelPath, float porcupineSensitivity,
-            String rhinoLibraryPath, String rhinoModelPath, float rhinoSensitivity, float rhinoEndpointDuration,
-            int audioDeviceIndex, String outputPath, boolean requireEndpoint) {
+        String accessKey, String keywordPath, String contextPath,
+        String porcupineLibraryPath, String porcupineModelPath, float porcupineSensitivity,
+        String rhinoLibraryPath, String rhinoModelPath, float rhinoSensitivity, float rhinoEndpointDuration,
+        int audioDeviceIndex, String outputPath, boolean requireEndpoint
+    ) {
         Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://192.168.1.128:8123/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -59,7 +68,7 @@ public class MicDemo {
             micDataLine.open(format);
         } catch (LineUnavailableException e) {
             System.err.println("Failed to get a valid capture device. Use --show_audio_devices to " +
-                    "show available capture devices and their indices");
+                "show available capture devices and their indices");
             System.exit(1);
             return;
         }
@@ -95,8 +104,10 @@ public class MicDemo {
 
             } else {
                 System.out.println("Didn't understand the command.");
-
-                service.sendWakeWord("No te he entendido").enqueue(new Callback<Void>() {
+                int min = 0;
+                int max = understand.length - 1;
+                int random_int = (int) Math.floor(Math.random() * (max - min + 1) + min);
+                service.sendWakeWord(understand[random_int]).enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
                         System.out.println("onResponse" + response);
@@ -113,20 +124,20 @@ public class MicDemo {
         Picovoice picovoice = null;
         try {
             picovoice = new Picovoice.Builder()
-                    .setAccessKey(accessKey)
-                    .setKeywordPath(keywordPath)
-                    .setWakeWordCallback(wakeWordCallback)
-                    .setContextPath(contextPath)
-                    .setInferenceCallback(inferenceCallback)
-                    .setPorcupineLibraryPath(porcupineLibraryPath)
-                    .setPorcupineModelPath(porcupineModelPath)
-                    .setPorcupineSensitivity(porcupineSensitivity)
-                    .setRhinoLibraryPath(rhinoLibraryPath)
-                    .setRhinoModelPath(rhinoModelPath)
-                    .setRhinoSensitivity(rhinoSensitivity)
-                    .setRhinoEndpointDuration(rhinoEndpointDuration)
-                    .setRequireEndpoint(requireEndpoint)
-                    .build();
+                .setAccessKey(accessKey)
+                .setKeywordPath(keywordPath)
+                .setWakeWordCallback(wakeWordCallback)
+                .setContextPath(contextPath)
+                .setInferenceCallback(inferenceCallback)
+                .setPorcupineLibraryPath(porcupineLibraryPath)
+                .setPorcupineModelPath(porcupineModelPath)
+                .setPorcupineSensitivity(porcupineSensitivity)
+                .setRhinoLibraryPath(rhinoLibraryPath)
+                .setRhinoModelPath(rhinoModelPath)
+                .setRhinoSensitivity(rhinoSensitivity)
+                .setRhinoEndpointDuration(rhinoEndpointDuration)
+                .setRequireEndpoint(requireEndpoint)
+                .build();
 
             if (outputPath != null) {
                 outputFile = new File(outputPath);
@@ -175,7 +186,10 @@ public class MicDemo {
 
                 // need to transfer to input stream to write
                 ByteArrayInputStream writeArray = new ByteArrayInputStream(outputStream.toByteArray());
-                AudioInputStream writeStream = new AudioInputStream(writeArray, format, totalBytesCaptured / format.getFrameSize());
+                AudioInputStream writeStream = new AudioInputStream(
+                    writeArray,
+                    format,
+                    totalBytesCaptured / format.getFrameSize());
 
                 try {
                     AudioSystem.write(writeStream, AudioFileFormat.Type.WAVE, outputFile);
@@ -211,13 +225,16 @@ public class MicDemo {
 
         if (!AudioSystem.isLineSupported(dataLineInfo)) {
             throw new LineUnavailableException("Default capture device does not support the audio " +
-                    "format required by Picovoice (16kHz, 16-bit, linearly-encoded, single-channel PCM).");
+                "format required by Picovoice (16kHz, 16-bit, linearly-encoded, single-channel PCM).");
         }
 
         return (TargetDataLine) AudioSystem.getLine(dataLineInfo);
     }
 
-    private static TargetDataLine getAudioDevice(int deviceIndex, DataLine.Info dataLineInfo) throws LineUnavailableException {
+    private static TargetDataLine getAudioDevice(
+        int deviceIndex,
+        DataLine.Info dataLineInfo
+    ) throws LineUnavailableException {
 
         if (deviceIndex >= 0) {
             try {
@@ -228,7 +245,7 @@ public class MicDemo {
                     return (TargetDataLine) mixer.getLine(dataLineInfo);
                 } else {
                     System.err.printf("Audio capture device at index %s does not support the audio format required by " +
-                            "Picovoice. Using default capture device.", deviceIndex);
+                        "Picovoice. Using default capture device.", deviceIndex);
                 }
             } catch (Exception e) {
                 System.err.printf("No capture device found at index %s. Using default capture device.", deviceIndex);
@@ -290,11 +307,11 @@ public class MicDemo {
                 porcupineSensitivity = Float.parseFloat(porcupineSensitivityStr);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Failed to parse Porcupine sensitivity value. " +
-                        "Must be a floating-point number between [0,1].");
+                    "Must be a floating-point number between [0,1].");
             }
             if (porcupineSensitivity < 0 || porcupineSensitivity > 1) {
                 throw new IllegalArgumentException(String.format("Failed to parse Porcupine  sensitivity value (%s). " +
-                        "Must be a floating-point number between [0,1].", porcupineSensitivity));
+                    "Must be a floating-point number between [0,1].", porcupineSensitivity));
             }
         }
         float rhinoSensitivity = 0.5f;
@@ -303,11 +320,11 @@ public class MicDemo {
                 rhinoSensitivity = Float.parseFloat(rhinoSensitivityStr);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Failed to parse Rhino sensitivity value. " +
-                        "Must be a floating-point number between [0,1].");
+                    "Must be a floating-point number between [0,1].");
             }
             if (rhinoSensitivity < 0 || rhinoSensitivity > 1) {
                 throw new IllegalArgumentException(String.format("Failed to parse Rhino sensitivity value (%s). " +
-                        "Must be a floating-point number between [0,1].", rhinoSensitivity));
+                    "Must be a floating-point number between [0,1].", rhinoSensitivity));
             }
         }
 
@@ -318,12 +335,12 @@ public class MicDemo {
                 endpointDuration = Float.parseFloat(endpointDurationStr);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Failed to parse endpointDuration value. " +
-                        "Must be a floating-point number between [0.5, 5.0].");
+                    "Must be a floating-point number between [0.5, 5.0].");
             }
 
             if (endpointDuration < 0.5 || endpointDuration > 5.0) {
                 throw new IllegalArgumentException(String.format("Failed to parse endpointDuration value (%s). " +
-                        "Must be a floating-point number between [0.5, 5.0].", endpointDuration));
+                    "Must be a floating-point number between [0.5, 5.0].", endpointDuration));
             }
         }
 
@@ -349,11 +366,11 @@ public class MicDemo {
                 audioDeviceIndex = Integer.parseInt(audioDeviceIndexStr);
                 if (audioDeviceIndex < 0) {
                     throw new IllegalArgumentException(String.format("Audio device index %s is not a " +
-                            "valid positive integer.", audioDeviceIndexStr));
+                        "valid positive integer.", audioDeviceIndexStr));
                 }
             } catch (Exception e) {
                 throw new IllegalArgumentException(String.format("Audio device index '%s' is not a " +
-                        "valid positive integer.", audioDeviceIndexStr));
+                    "valid positive integer.", audioDeviceIndexStr));
             }
         }
 
@@ -363,98 +380,98 @@ public class MicDemo {
         }
 
         runDemo(accessKey, keywordPath, contextPath,
-                porcupineLibraryPath, porcupineModelPath, porcupineSensitivity,
-                rhinoLibraryPath, rhinoModelPath, rhinoSensitivity, endpointDuration,
-                audioDeviceIndex, outputPath, requireEndpoint);
+            porcupineLibraryPath, porcupineModelPath, porcupineSensitivity,
+            rhinoLibraryPath, rhinoModelPath, rhinoSensitivity, endpointDuration,
+            audioDeviceIndex, outputPath, requireEndpoint);
     }
 
     private static Options BuildCommandLineOptions() {
         Options options = new Options();
 
         options.addOption(Option.builder("a")
-                .longOpt("access_key")
-                .hasArg(true)
-                .desc("AccessKey obtained from Picovoice Console (https://console.picovoice.ai/).")
-                .build());
+            .longOpt("access_key")
+            .hasArg(true)
+            .desc("AccessKey obtained from Picovoice Console (https://console.picovoice.ai/).")
+            .build());
 
         options.addOption(Option.builder("k")
-                .longOpt("keyword_path")
-                .hasArg(true)
-                .desc("Absolute path to a Porcupine keyword file.")
-                .build());
+            .longOpt("keyword_path")
+            .hasArg(true)
+            .desc("Absolute path to a Porcupine keyword file.")
+            .build());
 
         options.addOption(Option.builder("c")
-                .longOpt("context_path")
-                .hasArg(true)
-                .desc("Absolute path to a Rhino context file.")
-                .build());
+            .longOpt("context_path")
+            .hasArg(true)
+            .desc("Absolute path to a Rhino context file.")
+            .build());
 
         options.addOption(Option.builder("pl")
-                .longOpt("porcupine_library_path")
-                .hasArg(true)
-                .desc("Absolute path to the Porcupine native runtime library.")
-                .build());
+            .longOpt("porcupine_library_path")
+            .hasArg(true)
+            .desc("Absolute path to the Porcupine native runtime library.")
+            .build());
 
         options.addOption(Option.builder("pm")
-                .longOpt("porcupine_model_path")
-                .hasArg(true)
-                .desc("Absolute path to Porcupine's model file.")
-                .build());
+            .longOpt("porcupine_model_path")
+            .hasArg(true)
+            .desc("Absolute path to Porcupine's model file.")
+            .build());
 
         options.addOption(Option.builder("ps")
-                .longOpt("porcupine_sensitivity")
-                .hasArgs()
-                .desc("Sensitivity for detecting wake word. Each value should be a number within [0, 1]. A higher " +
-                        "sensitivity results in fewer misses at the cost of increasing the false alarm rate.")
-                .build());
+            .longOpt("porcupine_sensitivity")
+            .hasArgs()
+            .desc("Sensitivity for detecting wake word. Each value should be a number within [0, 1]. A higher " +
+                "sensitivity results in fewer misses at the cost of increasing the false alarm rate.")
+            .build());
 
         options.addOption(Option.builder("rl")
-                .longOpt("rhino_library_path")
-                .hasArg(true)
-                .desc("Absolute path to the Rhino native runtime library.")
-                .build());
+            .longOpt("rhino_library_path")
+            .hasArg(true)
+            .desc("Absolute path to the Rhino native runtime library.")
+            .build());
 
         options.addOption(Option.builder("rm")
-                .longOpt("rhino_model_path")
-                .hasArg(true)
-                .desc("Absolute path to Rhino's model file.")
-                .build());
+            .longOpt("rhino_model_path")
+            .hasArg(true)
+            .desc("Absolute path to Rhino's model file.")
+            .build());
 
         options.addOption(Option.builder("rs")
-                .longOpt("rhino_sensitivity")
-                .hasArgs()
-                .desc("Inference sensitivity. It should be a number within [0, 1]. A higher sensitivity value " +
-                        "results in fewer misses at the cost of (potentially) increasing the erroneous inference rate.")
-                .build());
+            .longOpt("rhino_sensitivity")
+            .hasArgs()
+            .desc("Inference sensitivity. It should be a number within [0, 1]. A higher sensitivity value " +
+                "results in fewer misses at the cost of (potentially) increasing the erroneous inference rate.")
+            .build());
 
         options.addOption(Option.builder("u")
-                .longOpt("endpoint_duration")
-                .hasArgs()
-                .desc("Endpoint duration in seconds. An endpoint is a chunk of silence at the end of an " +
-                        "utterance that marks the end of spoken command. It should be a positive number within [0.5, 5]. A lower endpoint " +
-                        "duration reduces delay and improves responsiveness. A higher endpoint duration assures Rhino doesn't return inference " +
-                        "pre-emptively in case the user pauses before finishing the request.")
-                .build());
+            .longOpt("endpoint_duration")
+            .hasArgs()
+            .desc("Endpoint duration in seconds. An endpoint is a chunk of silence at the end of an " +
+                "utterance that marks the end of spoken command. It should be a positive number within [0.5, 5]. A lower endpoint " +
+                "duration reduces delay and improves responsiveness. A higher endpoint duration assures Rhino doesn't return inference " +
+                "pre-emptively in case the user pauses before finishing the request.")
+            .build());
 
         options.addOption(Option.builder("e")
-                .longOpt("require_endpoint")
-                .hasArg(true)
-                .desc("If set to `true`, Rhino requires an endpoint (a chunk of silence) after the spoken command. " +
-                        "If set to `false`, Rhino tries to detect silence, but if it cannot, it still will provide inference regardless. Set " +
-                        "to `false` only if operating in an environment with overlapping speech (e.g. people talking in the background).")
-                .build());
+            .longOpt("require_endpoint")
+            .hasArg(true)
+            .desc("If set to `true`, Rhino requires an endpoint (a chunk of silence) after the spoken command. " +
+                "If set to `false`, Rhino tries to detect silence, but if it cannot, it still will provide inference regardless. Set " +
+                "to `false` only if operating in an environment with overlapping speech (e.g. people talking in the background).")
+            .build());
 
         options.addOption(Option.builder("o")
-                .longOpt("output_path")
-                .hasArg(true)
-                .desc("Absolute path to recorded audio for debugging.")
-                .build());
+            .longOpt("output_path")
+            .hasArg(true)
+            .desc("Absolute path to recorded audio for debugging.")
+            .build());
 
         options.addOption(Option.builder("di")
-                .longOpt("audio_device_index")
-                .hasArg(true)
-                .desc("Index of input audio device.")
-                .build());
+            .longOpt("audio_device_index")
+            .hasArg(true)
+            .desc("Index of input audio device.")
+            .build());
 
         options.addOption(new Option("sd", "show_audio_devices", false, "Print available recording devices."));
         options.addOption(new Option("h", "help", false, ""));
