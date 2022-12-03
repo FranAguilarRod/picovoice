@@ -106,7 +106,7 @@ class PicovoiceDemo(Thread):
             print('  }')
             print('}\n')
         else:
-            textToSpeech("No te he entendido")
+            self.textToSpeech("No te he entendido")
             print("Didn't understand the command.\n")
 
     def textToSpeech(text):
