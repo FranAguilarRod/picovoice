@@ -8,7 +8,7 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 #
-
+import requests
 import argparse
 import os
 import sys
@@ -106,7 +106,11 @@ class PicovoiceDemo(Thread):
             print('  }')
             print('}\n')
         else:
+            textToSpeech("No te he entendido")
             print("Didn't understand the command.\n")
+
+    def textToSpeech(text):
+        requests.post("http://192.168.1.128:12101/api/text-to-speech", json = text)
 
     def run(self):
         recorder = None
