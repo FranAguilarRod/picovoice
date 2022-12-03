@@ -106,11 +106,8 @@ class PicovoiceDemo(Thread):
             print('  }')
             print('}\n')
         else:
-            self.textToSpeech("No te he entendido")
+            requests.post("http://192.168.1.128:12101/api/text-to-speech", json = "No te he entendido")
             print("Didn't understand the command.\n")
-
-    def textToSpeech(text):
-        requests.post("http://192.168.1.128:12101/api/text-to-speech", json = text)
 
     def run(self):
         recorder = None
