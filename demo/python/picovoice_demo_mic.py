@@ -115,11 +115,12 @@ class PicovoiceDemo(Thread):
             }
             url = "http://192.168.1.128:8123/api/events/rhasspy_%s" % inference.intent
             response = requests.post(
-                url,
+                url=url,
                 headers=headers,
                 json=json_dumps
             )
             print(url)
+            print(response.headers)
             print(response)
         else:
             requests.post("http://192.168.1.128:12101/api/text-to-speech", json="No te he entendido")
