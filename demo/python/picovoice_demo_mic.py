@@ -107,7 +107,7 @@ class PicovoiceDemo(Thread):
             #     print("    %s : '%s'" % (slot, value))
             # print('  }')
             # print('}\n')
-            print(json.dumps(inference.slots.items()))
+            print(inference.slots.items())
         else:
             requests.post("http://192.168.1.128:12101/api/text-to-speech", json="No te he entendido")
             print("Didn't understand the command.\n")
