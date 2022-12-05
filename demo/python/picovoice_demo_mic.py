@@ -8,14 +8,15 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 #
-import requests
 import argparse
 import os
-import sys
 import struct
+import sys
 import wave
 from threading import Thread
+import json
 
+import requests
 from picovoice import *
 from pvrecorder import PvRecorder
 
@@ -94,19 +95,21 @@ class PicovoiceDemo(Thread):
     @staticmethod
     def _wake_word_callback():
         print('[wake word]\n')
+        os.system("aplay mixkit-positive-interface-beep-221.wav")
 
     @staticmethod
     def _inference_callback(inference):
         if inference.is_understood:
-            print('{')
+            # print('{')
             print("  intent : '%s'" % inference.intent)
-            print('  slots : {')
-            for slot, value in inference.slots.items():
-                print("    %s : '%s'" % (slot, value))
-            print('  }')
-            print('}\n')
+            # print('  slots : {')
+            # for slot, value in inference.slots.items():
+            #     print("    %s : '%s'" % (slot, value))
+            # print('  }')
+            # print('}\n')
+            print(json.dumps(inference.slots.items()))
         else:
-            requests.post("http://192.168.1.128:12101/api/text-to-speech", json = "No te he entendido")
+            requests.post("http://192.168.1.128:12101/api/text-to-speech", json="No te he entendido")
             print("Didn't understand the command.\n")
 
     def run(self):
