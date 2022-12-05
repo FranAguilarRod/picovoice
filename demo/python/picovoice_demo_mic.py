@@ -101,7 +101,7 @@ class PicovoiceDemo(Thread):
     def _inference_callback(inference):
         if inference.is_understood:
             # print('{')
-            print("  intent : '%s'" % inference.intent)
+            # print("  intent : '%s'" % inference.intent)
             # print('  slots : {')
             # for slot, value in inference.slots.items():
             #     print("    %s : '%s'" % (slot, value))
@@ -113,11 +113,14 @@ class PicovoiceDemo(Thread):
                 "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkZjQ1MjUzMGRmOTc0MmM5YTQzZTYxNDcwOGZiY2U0MiIsImlhdCI6MTY2OTEzOTc1NywiZXhwIjoxOTg0NDk5NzU3fQ.i05deYebPb6JfRQTVdAKFdnGFEtV1EL3ifK_Vqcm3YQ",
                 "content-type": "application/json"
             }
-            requests.post(
-                "http://192.168.1.128:8123/api/events/rhasspy_%s" % inference.intent,
+            url = "http://192.168.1.128:8123/api/events/rhasspy_%s" % inference.intent
+            response = requests.post(
+                url,
                 headers=headers,
                 json=json_dumps
             )
+            print(url)
+            print(response)
         else:
             requests.post("http://192.168.1.128:12101/api/text-to-speech", json="No te he entendido")
             print("Didn't understand the command.\n")
