@@ -109,19 +109,10 @@ class PicovoiceDemo(Thread):
             # print('}\n')
             json_dumps = json.dumps(inference.slots)
             print(json_dumps)
-            headers = {
-                "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkZjQ1MjUzMGRmOTc0MmM5YTQzZTYxNDcwOGZiY2U0MiIsImlhdCI6MTY2OTEzOTc1NywiZXhwIjoxOTg0NDk5NzU3fQ.i05deYebPb6JfRQTVdAKFdnGFEtV1EL3ifK_Vqcm3YQ",
-                "content-type": "application/json"
-            }
-            url = "http://192.168.1.128:8123/api/events/rhasspy_%s" % inference.intent
-            response = requests.post(
-                url=url,
-                headers=headers,
-                json=json_dumps
-            )
-            print(url)
-            print(response.headers)
-            print(response)
+            os.system("curl --location --request POST 'http://192.168.1.128:8123/api/events/rhasspy_%s' "
+                      "--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkZjQ1MjUzMGRmOTc0MmM5YTQzZTYxNDcwOGZiY2U0MiIsImlhdCI6MTY2OTEzOTc1NywiZXhwIjoxOTg0NDk5NzU3fQ.i05deYebPb6JfRQTVdAKFdnGFEtV1EL3ifK_Vqcm3YQ' "
+                      "--header 'Content-Type: application/json' "
+                      "--data-raw '%s'" % (inference.intent, json_dumps))
         else:
             requests.post("http://192.168.1.128:12101/api/text-to-speech", json="No te he entendido")
             print("Didn't understand the command.\n")
