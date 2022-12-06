@@ -16,7 +16,7 @@ import wave
 from threading import Thread
 import json
 
-import requests
+from random import randrange
 from picovoice import *
 from pvrecorder import PvRecorder
 
@@ -100,13 +100,6 @@ class PicovoiceDemo(Thread):
     @staticmethod
     def _inference_callback(inference):
         if inference.is_understood:
-            # print('{')
-            # print("  intent : '%s'" % inference.intent)
-            # print('  slots : {')
-            # for slot, value in inference.slots.items():
-            #     print("    %s : '%s'" % (slot, value))
-            # print('  }')
-            # print('}\n')
             json_dumps = json.dumps(inference.slots)
             print(json_dumps)
             os.system("curl --location --request POST 'http://192.168.1.128:8123/api/events/rhasspy_%s' "
@@ -114,7 +107,14 @@ class PicovoiceDemo(Thread):
                       "--header 'Content-Type: application/json' "
                       "--data-raw '%s'" % (inference.intent, json_dumps))
         else:
-            requests.post("http://192.168.1.128:12101/api/text-to-speech", json="No te he entendido")
+            understand = [
+                "No te he entendido",
+                "Que dise cabesa",
+                "¿Me lo puedes repetir?"
+            ]
+            os.system("curl --location --request POST 'http://192.168.1.128:12101/api/text-to-speech' "
+                      "--header 'Content-Type: text/plain' "
+                      "--data-raw '%s'" % understand[randrange(2)])
             print("Didn't understand the command.\n")
 
     def run(self):
