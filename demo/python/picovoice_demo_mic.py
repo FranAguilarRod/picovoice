@@ -95,7 +95,7 @@ class PicovoiceDemo(Thread):
     @staticmethod
     def _wake_word_callback():
         print('[wake word]\n')
-        os.system("aplay mixkit-positive-interface-beep-221.wav")
+        os.system("aplay -D default:CARD=Device mixkit-positive-interface-beep-221.wav")
 
     @staticmethod
     def _inference_callback(inference):
