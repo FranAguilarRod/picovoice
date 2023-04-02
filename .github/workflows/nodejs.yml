@@ -5,19 +5,23 @@ on:
   push:
     branches: [ master ]
     paths:
+      - '.github/workflows/nodejs.yml'
       - 'sdk/nodejs/**'
       - '!sdk/nodejs/README.md'
+      - 'resources/audio_samples/**'
       - 'resources/porcupine'
       - 'resources/rhino'
-      - '.github/workflows/nodejs.yml'
+      - 'resources/test/**'
   pull_request:
     branches: [ master ]
     paths:
+      - '.github/workflows/nodejs.yml'
       - 'sdk/nodejs/**'
       - '!sdk/nodejs/README.md'
+      - 'resources/audio_samples/**'
       - 'resources/porcupine'
       - 'resources/rhino'
-      - '.github/workflows/nodejs.yml'
+      - 'resources/test/**'
 
 defaults:
   run:
@@ -30,7 +34,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        node-version: [14.x, 16.x]
+        node-version: [14.x, 16.x, 18.x]
 
     steps:
     - uses: actions/checkout@v2

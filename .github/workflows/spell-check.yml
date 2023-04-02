@@ -16,10 +16,10 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Install CSpell
         run: npm install -g cspell
 
       - name: Run CSpell
-        run: cspell --config resources/spell-check/.cspell.json "**/*"
+        run: cspell --config resources/lint/spell-check/.cspell.json "**/*"
