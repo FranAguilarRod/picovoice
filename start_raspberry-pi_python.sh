@@ -6,6 +6,5 @@ python3 demo/python/picovoice_demo_mic.py \
 --keyword_path Alfredo_es_raspberry-pi_v2_1_0.ppn \
 --rhino_model_path rhino_params_es.pv \
 --context_path Custom_es_raspberry-pi_v2_1_0.rhn \
---porcupine_sensitivity 0.2 \
---audio_device_index 9
-
+--porcupine_sensitivity 0.5 \
+--audio_device_index -1

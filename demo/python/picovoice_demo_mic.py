@@ -95,7 +95,7 @@ class PicovoiceDemo(Thread):
     @staticmethod
     def _wake_word_callback():
         print('[wake word]\n')
-        os.system("aplay -D default:CARD=Device mixkit-positive-interface-beep-221.wav")
+        os.system("aplay -D sysdefault:CARD=Device mixkit-positive-interface-beep-221.wav")
 
     @staticmethod
     def _inference_callback(inference):
@@ -123,6 +123,7 @@ class PicovoiceDemo(Thread):
 
         try:
             recorder = PvRecorder(device_index=self.audio_device_index, frame_length=self._picovoice.frame_length)
+            print("pvrecorder.py version: %s" % recorder.version)
             recorder.start()
 
             if self.output_path is not None:
